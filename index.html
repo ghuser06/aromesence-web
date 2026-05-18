@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Aromesence — Perfumes originales para hombre y mujer al mejor precio. Las mejores marcas: Versace, JPG, Paco Rabanne, Montblanc y más.">
+  <title>Aromesence — Fragancias Originales</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="#" class="nav-logo">AROMESENCE ✦</a>
+    <ul class="nav-links">
+      <li><a href="#inicio">Inicio</a></li>
+      <li><a href="#catalogo-caballero">Catálogo Caballero</a></li>
+      <li><a href="#catalogo-dama">Catálogo Dama</a></li>
+      <li><a href="#resenas">Reseñas</a></li>
+      <li><a href="#" id="navCartBtn" class="nav-cart-link">Mi Carrito <span id="cartCount"
+            class="cart-count">0</span></a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Menú"><span></span><span></span><span></span></button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="inicio">
+    <div class="hero-particles"></div>
+    <span class="hero-badge">✦ 100% Originales</span>
+    <h1>Fragancias que<br>dejan huella</h1>
+    <p>Descubre nuestra colección exclusiva de perfumes para hombre y mujer de las mejores casas del mundo.</p>
+    <a href="#catalogo-caballero" class="hero-cta">Ver Catálogo ↓</a>
+  </section>
+
+  <!-- CATÁLOGO CABALLERO -->
+  <section id="catalogo-caballero">
+    <div class="section-header">
+      <h2>Colección para Él</h2>
+      <p>Explora más de 30 fragancias originales de las marcas más prestigiosas</p>
+      <div class="section-divider"></div>
+      <div style="margin-top:1.5rem">
+        <input type="text" id="searchInput" placeholder="Buscar perfume o marca..." class="search-input">
+      </div>
+    </div>
+    <div class="products-section">
+      <div class="product-grid" id="productGrid"></div>
+    </div>
+  </section>
+
+  <!-- CATÁLOGO DAMA -->
+  <section id="catalogo-dama">
+    <div class="section-header">
+      <h2>Colección para Ella</h2>
+      <p>Próximamente las fragancias más sofisticadas y elegantes para mujer</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="products-section">
+      <div class="product-grid" id="productGridDama">
+        <!-- Placeholder cards for upcoming women's collection -->
+        <div class="product-card placeholder-card">
+          <div class="product-img-wrap placeholder-img">
+            <div class="placeholder-icon">✦</div>
+          </div>
+          <div class="product-info">
+            <span class="product-brand">Próximamente</span>
+            <h3 class="product-name">Nueva Fragancia</h3>
+            <span class="product-type">Muy pronto</span>
+          </div>
+        </div>
+        <div class="product-card placeholder-card">
+          <div class="product-img-wrap placeholder-img">
+            <div class="placeholder-icon">✦</div>
+          </div>
+          <div class="product-info">
+            <span class="product-brand">Próximamente</span>
+            <h3 class="product-name">Nueva Fragancia</h3>
+            <span class="product-type">Muy pronto</span>
+          </div>
+        </div>
+        <div class="product-card placeholder-card">
+          <div class="product-img-wrap placeholder-img">
+            <div class="placeholder-icon">✦</div>
+          </div>
+          <div class="product-info">
+            <span class="product-brand">Próximamente</span>
+            <h3 class="product-name">Nueva Fragancia</h3>
+            <span class="product-type">Muy pronto</span>
+          </div>
+        </div>
+        <div class="product-card placeholder-card">
+          <div class="product-img-wrap placeholder-img">
+            <div class="placeholder-icon">✦</div>
+          </div>
+          <div class="product-info">
+            <span class="product-brand">Próximamente</span>
+            <h3 class="product-name">Nueva Fragancia</h3>
+            <span class="product-type">Muy pronto</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESEÑAS -->
+  <section id="resenas" class="reviews-section">
+    <div class="section-header">
+      <h2>Reseñas de Clientes</h2>
+      <p>Lo que dicen quienes ya confían en Aromesence</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Increíble atención y perfumes 100% originales. Pedí el Versace Eros y llegó en perfectas
+          condiciones. ¡Totalmente recomendado!"</p>
+        <div class="review-author">
+          <div class="review-avatar">MA</div>
+          <div>
+            <div class="review-name">Marco Alejandro</div>
+            <div class="review-date">Hace 2 semanas</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Los mejores precios que he encontrado en perfumes originales. La entrega fue rapidísima
+          y el empaque muy cuidado. Volveré a comprar."</p>
+        <div class="review-author">
+          <div class="review-avatar">LC</div>
+          <div>
+            <div class="review-name">Laura Castillo</div>
+            <div class="review-date">Hace 1 mes</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★<span class="star-empty">★</span></div>
+        <p class="review-text">"Compré el 1 Million y el Bad Boy, ambos originales. La comunicación por WhatsApp fue
+          excelente, resolvieron todas mis dudas al instante."</p>
+        <div class="review-author">
+          <div class="review-avatar">DP</div>
+          <div>
+            <div class="review-name">Daniel Pérez</div>
+            <div class="review-date">Hace 3 semanas</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Mi novio quedó encantado con el JPG Le Male Elixir. La presentación es premium y el
+          precio imbatible. ¡5 estrellas sin duda!"</p>
+        <div class="review-author">
+          <div class="review-avatar">SG</div>
+          <div>
+            <div class="review-name">Sofía González</div>
+            <div class="review-date">Hace 1 semana</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Ya es la tercera vez que compro aquí. La variedad de marcas es increíble y siempre
+          llegan sellados. Sin duda mi tienda favorita."</p>
+        <div class="review-author">
+          <div class="review-avatar">RH</div>
+          <div>
+            <div class="review-name">Roberto Hernández</div>
+            <div class="review-date">Hace 2 meses</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Excelente servicio. Me asesoraron para elegir el perfume perfecto para una ocasión
+          especial. El Explorer de Montblanc fue todo un acierto."</p>
+        <div class="review-author">
+          <div class="review-avatar">AM</div>
+          <div>
+            <div class="review-name">Ana Martínez</div>
+            <div class="review-date">Hace 3 días</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHECKOUT MODAL -->
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModal">&times;</button>
+      <h2 class="modal-title">Finalizar Compra</h2>
+
+      <!-- Cart Summary -->
+      <div class="cart-summary" id="cartSummary">
+        <h3>Tu Carrito</h3>
+        <div id="cartItems" class="cart-items"></div>
+        <div class="cart-total">
+          <span>Total:</span>
+          <span id="cartTotal" class="total-price">$0 MXN</span>
+        </div>
+      </div>
+
+      <form id="checkoutForm" class="checkout-form">
+        <!-- Personal Data -->
+        <div class="form-section">
+          <h3><span class="form-step">1</span> Datos Personales</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="checkoutName">Nombre completo</label>
+              <input type="text" id="checkoutName" placeholder="Tu nombre" required>
+            </div>
+            <div class="form-group">
+              <label for="checkoutPhone">Teléfono</label>
+              <input type="tel" id="checkoutPhone" placeholder="+52 (___) ___-____" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="checkoutEmail">Email (opcional)</label>
+            <input type="email" id="checkoutEmail" placeholder="correo@ejemplo.com">
+          </div>
+        </div>
+
+        <!-- Shipping -->
+        <div class="form-section">
+          <h3><span class="form-step">2</span> Dirección de Envío</h3>
+          <div class="form-group">
+            <label for="checkoutAddress">Calle y Número</label>
+            <input type="text" id="checkoutAddress" placeholder="Av. Reforma #123" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="checkoutCP">Código Postal</label>
+              <input type="text" id="checkoutCP" placeholder="00000" maxlength="5" pattern="[0-9]{5}" required>
+            </div>
+            <div class="form-group">
+              <label for="checkoutColonia">Colonia</label>
+              <select id="checkoutColonia" required disabled>
+                <option value="">Ingresa tu CP primero</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="checkoutCity">Ciudad / Municipio</label>
+              <input type="text" id="checkoutCity" placeholder="Ciudad" required>
+            </div>
+            <div class="form-group">
+              <label for="checkoutState">Estado</label>
+              <select id="checkoutState" required disabled>
+                <option value="">Ingresa tu CP primero</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment (Mercado Pago) -->
+        <div class="form-section">
+          <h3><span class="form-step">3</span> Datos de Tarjeta</h3>
+          <div class="mp-payment-form">
+            <div class="form-group">
+              <label for="form-checkout__cardNumber">Número de Tarjeta</label>
+              <div id="form-checkout__cardNumber" class="mp-secure-field"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="form-checkout__expirationDate">Fecha de Expiración</label>
+                <div id="form-checkout__expirationDate" class="mp-secure-field"></div>
+              </div>
+              <div class="form-group">
+                <label for="form-checkout__securityCode">CVV</label>
+                <div id="form-checkout__securityCode" class="mp-secure-field"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="form-checkout__cardholderName">Nombre del Titular</label>
+              <input type="text" id="form-checkout__cardholderName" placeholder="Como aparece en la tarjeta" required>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="checkout-submit">
+          <span>Confirmar Pedido</span>
+          <span class="submit-arrow">→</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CART SIDEBAR -->
+  <div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-sidebar-header">
+      <h3>Mi Carrito</h3>
+      <button class="cart-sidebar-close" id="closeCart">&times;</button>
+    </div>
+    <div class="cart-sidebar-items" id="cartSidebarItems">
+      <div class="cart-empty">
+        <span class="cart-empty-icon">🛒</span>
+        <p>Tu carrito está vacío</p>
+      </div>
+    </div>
+    <div class="cart-sidebar-footer">
+      <div class="cart-sidebar-total">
+        <span>Total:</span>
+        <span id="cartSidebarTotal">$0 MXN</span>
+      </div>
+      <button class="checkout-btn" id="proceedCheckout">Proceder al Pago →</button>
+    </div>
+  </div>
+  <div class="cart-overlay" id="cartOverlay"></div>
+
+  <!-- FOOTER -->
+  <footer class="footer" id="contacto">
+    <div class="footer-logo">AROMESENCE ✦</div>
+    <p>Perfumes 100% originales · Envíos a todo México</p>
+    <p style="margin-top:.5rem">© 2026 Aromesence. Todos los derechos reservados.</p>
+  </footer>
+
+  <!-- WHATSAPP ACTUALIZADO -->
+  <a href="https://api.whatsapp.com/send?phone=5218130747621&text=Hola%20Aromesence,%20me%20gustaría%20más%20información%20sobre%20un%20perfume"
+    target="_blank" class="whatsapp-float" aria-label="WhatsApp">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+    </svg>
+  </a>
+
+  <!-- SDK de Mercado Pago v2 -->
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  
+  <script src="products.js"></script>
+  <script src="main.js"></script>
+</body>
+
+</html>
