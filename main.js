@@ -34,15 +34,15 @@ function updateCartUI() {
   const cartCount = document.getElementById('cartCount');
   const sidebarItems = document.getElementById('cartSidebarItems');
   const sidebarTotal = document.getElementById('cartSidebarTotal');
-  
+
   cartCount.innerText = cart.length;
-  
+
   if (cart.length === 0) {
     sidebarItems.innerHTML = '<div class="cart-empty"><span class="cart-empty-icon">🛒</span><p>Tu carrito está vacío</p></div>';
     sidebarTotal.innerText = '$0 MXN';
     return;
   }
-  
+
   sidebarItems.innerHTML = cart.map((item, index) => `
     <div class="cart-item">
       <img src="imagenes/${item.img}" alt="${item.name}" class="cart-item-img" onerror="this.src='https://via.placeholder.com/60'">
@@ -54,7 +54,7 @@ function updateCartUI() {
       <button onclick="removeFromCart(${index})" class="cart-item-remove">&times;</button>
     </div>
   `).join('');
-  
+
   const total = cart.reduce((sum, item) => sum + item.price, 0);
   sidebarTotal.innerText = `$${total.toLocaleString()} MXN`;
 }
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('cartSidebar').classList.remove('active');
     document.getElementById('cartOverlay').classList.remove('active');
   });
-  
+
   // Cerrar carrito al hacer clic en el overlay
   document.getElementById('cartOverlay').addEventListener('click', () => {
     document.getElementById('cartSidebar').classList.remove('active');
@@ -111,8 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mostrar modal
     const modal = document.getElementById('checkoutModal');
-    modal.style.display = 'flex'; // Forzamos el display
-    setTimeout(() => modal.classList.add('active'), 10); // Permitimos que aplique la animación
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('active'), 10);
   });
 
   // Cerrar modal con el botón X
@@ -134,19 +134,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // Función de validación de campos obligatorios
   function validateCheckout() {
     const requiredFields = [
-      'checkoutName', 'checkoutPhone', 'checkoutAddress', 
+      'checkoutName', 'checkoutPhone', 'checkoutAddress',
       'checkoutColonia', 'checkoutCP', 'checkoutCity', 'checkoutState'
     ];
     let isValid = true;
 
-    // Verificar campos de texto
     for (const fieldId of requiredFields) {
       const field = document.getElementById(fieldId);
       if (!field.value || field.value.trim() === '') {
         isValid = false;
-        field.style.border = '1px solid #e74c3c'; // Resaltar error en rojo
+        field.style.border = '1px solid #e74c3c';
       } else {
-        field.style.border = ''; // Limpiar error
+        field.style.border = '';
       }
     }
 
@@ -154,66 +153,150 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- 1. CONFIGURACIÓN DE MERCADO PAGO ---
-  // ⚠️ IMPORTANTE: Reemplaza con tu Public Key real de Mercado Pago
-  const mp = new MercadoPago("TEST-00000000-0000-0000-0000-000000000000", {
+  const mp = new MercadoPago('TEST-288dadf3-dd25-472a-83ec-be6f5f9c4376', {
     locale: 'es-MX'
   });
 
-  // Estilos base para los inputs seguros dentro de los iframes de MP
-  const mpStyles = {
-    color: '#f0ece2',
-    fontSize: '14px',
-    placeholderColor: '#6b677a'
-  };
+  // --- 2. DETECCIÓN DE RESULTADO DE PAGO ---
+  function verificarResultadoPago() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status') || urlParams.get('collection_status');
+    const paymentId = urlParams.get('payment_id');
 
-  // Crear y montar los Secure Fields de Mercado Pago
-  const cardNumberElement = mp.fields.create('cardNumber', {
-    placeholder: "Número de tarjeta",
-    style: mpStyles
-  }).mount('form-checkout__cardNumber');
+    if (!status) return;
 
-  const expirationDateElement = mp.fields.create('expirationDate', {
-    placeholder: "MM/AA",
-    style: mpStyles
-  }).mount('form-checkout__expirationDate');
+    window.history.replaceState({}, document.title, window.location.pathname);
 
-  const securityCodeElement = mp.fields.create('securityCode', {
-    placeholder: "CVV",
-    style: mpStyles
-  }).mount('form-checkout__securityCode');
-
-  // Flujo ordenado de cierre de orden
-  function finalizeOrder() {
-    alert("¡Gracias por tu compra en Aromesence! Tu pedido ha sido procesado con éxito.");
-    
-    // Limpiar carrito
-    cart = [];
-    updateCartUI();
-    
-    // Resetear completamente el formulario
-    document.getElementById('checkoutForm').reset();
-    
-    // Vaciar Secure Fields (limpiar iframes de MP)
-    cardNumberElement.unmount();
-    cardNumberElement.mount('form-checkout__cardNumber');
-    expirationDateElement.unmount();
-    expirationDateElement.mount('form-checkout__expirationDate');
-    securityCodeElement.unmount();
-    securityCodeElement.mount('form-checkout__securityCode');
-    
-    // Cerrar modal y limpiar bloqueos
-    const modal = document.getElementById('checkoutModal');
-    modal.classList.remove('active');
-    setTimeout(() => modal.style.display = 'none', 350);
-    document.getElementById('cartOverlay').classList.remove('active');
+    if (status === 'approved') {
+      mostrarNotificacionPago(
+        '✅ ¡Pago Aprobado!',
+        `Tu compra ha sido procesada con éxito. ID de pago: ${paymentId || 'N/A'}. Recibirás la confirmación pronto. ¡Gracias por comprar en Aromesence!`,
+        'success'
+      );
+      cart = [];
+      updateCartUI();
+    } else if (status === 'rejected') {
+      mostrarNotificacionPago(
+        '❌ Pago Fue Rechazado',
+        'Tu pago fue rechazado por Mercado Pago. Por favor, intenta con otro método de pago o revisa los fondos de tu tarjeta.',
+        'error'
+      );
+    } else if (status === 'pending' || status === 'in_process') {
+      mostrarNotificacionPago(
+        '⏳ Pago Pendiente',
+        `Tu pago está en proceso de verificación. ID: ${paymentId || 'N/A'}. Te notificaremos por correo una vez aprobado.`,
+        'pending'
+      );
+    }
   }
 
-  // --- 2. EVENTO DE CONFIRMACIÓN DE PAGO ---
+  function mostrarNotificacionPago(titulo, mensaje, tipo) {
+    const existente = document.getElementById('pagoNotificacion');
+    if (existente) existente.remove();
+
+    const colores = {
+      success: { bg: 'rgba(39, 174, 96, 0.15)', border: '#27ae60', text: '#2ecc71' },
+      error: { bg: 'rgba(231, 76, 60, 0.15)', border: '#e74c3c', text: '#e74c3c' },
+      pending: { bg: 'rgba(241, 196, 15, 0.15)', border: '#f1c40f', text: '#f1c40f' }
+    };
+    const color = colores[tipo] || colores.error;
+
+    const notificacion = document.createElement('div');
+    notificacion.id = 'pagoNotificacion';
+    notificacion.style.cssText = `
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+    `;
+    notificacion.innerHTML = `
+      <div style="
+        background: #1a1625; border: 1px solid ${color.border}; border-radius: 16px;
+        padding: 2.5rem; max-width: 480px; width: 90%; text-align: center;
+        box-shadow: 0 0 40px ${color.bg};
+      ">
+        <h2 style="color: ${color.text}; font-size: 1.5rem; margin-bottom: 1rem;">${titulo}</h2>
+        <p style="color: #c8c4d4; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">${mensaje}</p>
+        <button onclick="document.getElementById('pagoNotificacion').remove()" style="
+          background: ${color.border}; color: #fff; border: none; padding: 0.75rem 2rem;
+          border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: 600;
+        ">Entendido</button>
+      </div>
+    `;
+    document.body.appendChild(notificacion);
+  }
+
+  verificarResultadoPago();
+
+  // --- 3. GENERAR PREFERENCIA Y RENDERIZAR WALLET BRICK ---
+  let brickYaRenderizado = false;
+
+  async function pagarConMercadoPago() {
+    if (brickYaRenderizado) return;
+
+    try {
+      const items = cart.map(item => ({
+        title: `${item.brand} - ${item.name}`, // Mejor descripción uniendo marca y nombre
+        unit_price: Number(item.price),
+        quantity: 1,
+        currency_id: 'MXN'
+      }));
+
+      // CAMBIO IMPORTANTE: Se usa ruta relativa para que funcione tanto en local como desplegado
+      const response = await fetch('/api/crear-preferencia', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ items }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Error del servidor backend:', response.status, errorData);
+        alert(`Error al conectar con la pasarela de pagos (${response.status}).`);
+        // Volver a mostrar el botón si falla
+        document.querySelector('.checkout-submit').style.display = 'block';
+        return;
+      }
+
+      const preference = await response.json();
+
+      if (!preference.id) {
+        alert('No se pudo generar una orden de pago válida.');
+        document.querySelector('.checkout-submit').style.display = 'block';
+        return;
+      }
+
+      // Limpiar contenedor antes de pintar por si acaso
+      const container = document.getElementById('walletBrick_container');
+      if (container) container.innerHTML = '';
+
+      // Renderizar el botón oficial integrado de Mercado Pago (Wallet Brick)
+      await mp.bricks().create("wallet", "walletBrick_container", {
+        initialization: {
+          preferenceId: preference.id,
+        },
+        customization: {
+          texts: {
+            valueProp: 'smart_option',
+          },
+        },
+      });
+
+      brickYaRenderizado = true;
+
+    } catch (error) {
+      console.error("Error de red al conectar con /api/crear-preferencia:", error);
+      alert("Error de conexión. Asegúrate de tener conexión a internet.");
+      document.querySelector('.checkout-submit').style.display = 'block';
+    }
+  }
+
+  // --- 4. EVENTO DE CONFIRMACIÓN DE PAGO ---
   const checkoutForm = document.getElementById('checkoutForm');
   checkoutForm.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Evitar envío automático y recarga
+    e.preventDefault();
 
-    // 1. Seguridad: Validación nativa de HTML5 (Dirección, Nombres, etc.)
     if (!checkoutForm.checkValidity()) {
       checkoutForm.reportValidity();
       return;
@@ -226,46 +309,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const submitBtn = document.querySelector('.checkout-submit span');
-    const originalText = submitBtn.innerText;
-    submitBtn.innerText = "Procesando pago seguro...";
-    
-    try {
-      // Obtener el titular ingresado
-      const cardholderName = document.getElementById('form-checkout__cardholderName').value;
+    if (submitBtn) submitBtn.innerText = "Preparando pasarela...";
 
-      /* 
-       * SIMULACIÓN: Generación de Card Token.
-       * En un entorno real con una Public Key válida, usarías:
-       * 
-       * const token = await mp.fields.createCardToken({
-       *   cardholderName,
-       *   identificationType: "RFC", // (Opcional según MP)
-       * });
-       * console.log("Token generado:", token.id);
-       */
-       
-      // Simular tiempo de validación bancaria de Mercado Pago
-      setTimeout(() => {
-        finalizeOrder();
-        submitBtn.innerText = originalText;
-      }, 2000);
+    // Llamamos a la creación del brick seguro
+    await pagarConMercadoPago();
 
-    } catch (error) {
-      console.error("Error al generar el token:", error);
-      alert("Hubo un problema al validar la tarjeta. Revisa los datos e intenta de nuevo.");
-      submitBtn.innerText = originalText;
-    }
+    // Ocultar botón antiguo para dar paso al botón oficial azul de Mercado Pago
+    document.querySelector('.checkout-submit').style.display = 'none';
   });
 
-  // Autocompletado de Código Postal (UX)
+  // Autocompletado de Código Postal (Zippopotam)
   const cpInput = document.getElementById('checkoutCP');
   const coloniaSelect = document.getElementById('checkoutColonia');
   const stateSelect = document.getElementById('checkoutState');
 
   cpInput.addEventListener('input', async (e) => {
     const cp = e.target.value;
-    
-    // Solo consultar la API cuando haya exactamente 5 dígitos
+
     if (cp.length === 5 && !isNaN(cp)) {
       coloniaSelect.innerHTML = '<option value="">Cargando colonias...</option>';
       stateSelect.innerHTML = '<option value="">Cargando estado...</option>';
@@ -275,15 +335,13 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const response = await fetch(`https://api.zippopotam.us/mx/${cp}`);
         if (!response.ok) throw new Error("CP no encontrado");
-        
+
         const data = await response.json();
         const estado = data.places[0].state;
-        
-        // Llenar y habilitar Select de Estado
+
         stateSelect.innerHTML = `<option value="${estado}">${estado}</option>`;
         stateSelect.disabled = false;
-        
-        // Llenar y habilitar Select de Colonias
+
         coloniaSelect.innerHTML = '<option value="">Selecciona tu Colonia</option>';
         data.places.forEach(place => {
           const option = document.createElement('option');
@@ -298,7 +356,6 @@ document.addEventListener('DOMContentLoaded', () => {
         stateSelect.innerHTML = '<option value="">CP Inválido</option>';
       }
     } else {
-      // Si se borran dígitos, regresar al estado bloqueado
       coloniaSelect.innerHTML = '<option value="">Ingresa tu CP primero</option>';
       stateSelect.innerHTML = '<option value="">Ingresa tu CP primero</option>';
       coloniaSelect.disabled = true;

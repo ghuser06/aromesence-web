@@ -201,6 +201,7 @@
           <span>Total:</span>
           <span id="cartTotal" class="total-price">$0 MXN</span>
         </div>
+        <div id="walletBrick_container"></div>
       </div>
 
       <form id="checkoutForm" class="checkout-form">
@@ -256,29 +257,12 @@
           </div>
         </div>
 
-        <!-- Payment (Mercado Pago) -->
+        <!-- Método de Pago (Mercado Pago Checkout Pro) -->
         <div class="form-section">
-          <h3><span class="form-step">3</span> Datos de Tarjeta</h3>
-          <div class="mp-payment-form">
-            <div class="form-group">
-              <label for="form-checkout__cardNumber">Número de Tarjeta</label>
-              <div id="form-checkout__cardNumber" class="mp-secure-field"></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="form-checkout__expirationDate">Fecha de Expiración</label>
-                <div id="form-checkout__expirationDate" class="mp-secure-field"></div>
-              </div>
-              <div class="form-group">
-                <label for="form-checkout__securityCode">CVV</label>
-                <div id="form-checkout__securityCode" class="mp-secure-field"></div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="form-checkout__cardholderName">Nombre del Titular</label>
-              <input type="text" id="form-checkout__cardholderName" placeholder="Como aparece en la tarjeta" required>
-            </div>
-          </div>
+          <h3><span class="form-step">3</span> Método de Pago</h3>
+          <p style="color: #a09cae; font-size: 0.9rem; margin-bottom: 0.5rem;">
+            Al confirmar, se generará el botón oficial de Mercado Pago para que completes tu pago de forma segura.
+          </p>
         </div>
 
         <button type="submit" class="checkout-submit">
