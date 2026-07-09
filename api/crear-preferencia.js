@@ -27,43 +27,26 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No se recibieron artículos válidos.' });
     }
 
-    // Catálogo de precios autoritativo en el servidor — previene manipulación de precios
-    const catalogoPreciosServidor = {
-      'Bharara - Bharara King': 1850,
-      'Versace - Eros': 1650,
-      'Jean Paul Gaultier - Le Beau EDT': 1750,
-      'Jean Paul Gaultier - Le Beau Le Parfum': 2100,
-      'Jean Paul Gaultier - Le Beau Paradise Garden': 2200,
-      'Jean Paul Gaultier - Le Male Elixir': 2350,
-      'Jean Paul Gaultier - Scandal Pour Homme': 1950,
-      'Jean Paul Gaultier - Scandal Le Parfum': 2150,
-      'Paco Rabanne - Invictus': 1550,
-      'Paco Rabanne - Invictus Victory Elixir': 2400,
-      'Paco Rabanne - 1 Million': 1600,
-      'Versace - Pour Homme': 1150,
-      'Versace - Dylan Blue': 1350,
-      'Dolce & Gabbana - K': 1550,
-      'Montblanc - Explorer': 1200,
-      'Montblanc - Starwalker': 1050,
-      'Montblanc - Legend Spirit': 1100,
-      'Carolina Herrera - 212 VIP Black': 1700,
-      'Carolina Herrera - CH Men': 1450,
-      'Carolina Herrera - Bad Boy': 1550,
-      'Moschino - Toy Boy': 1300,
-      'Halloween - Man': 650,
-      'Halloween - Man Hero': 750,
-      'Tommy Hilfiger - Tommy': 850,
-      'Hugo Boss - Hugo Man': 1050,
-      'Nautica - Voyage': 450,
-      'Nautica - Voyage N-83': 500,
-      'Nautica - Voyage Sport': 500,
-      'Nautica - Classic': 450,
-      'Perry Ellis - 360° Red': 550,
-      'Calvin Klein - CK Be': 650,
-      'Coach - For Men': 1100,
-      'Lacoste - L.12.12 Blanc': 950,
-      'Paris Hilton - For Men': 550,
-    };
+    // Precios autoritativos desde Supabase (tabla `perfumes`) — única fuente de verdad.
+    // La clave publishable solo permite lectura pública (RLS); se puede sobreescribir por env vars.
+    const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ivsitbxbixqvllkcjbui.supabase.co';
+    const SUPABASE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_VkfErErpRg7sEeaKlFDuTw_wzd0GZhq';
+
+    const supabaseResponse = await fetch(
+      `${SUPABASE_URL}/rest/v1/perfumes?select=marca,nombre,precio,stock`,
+      { headers: { apikey: SUPABASE_KEY } }
+    );
+
+    if (!supabaseResponse.ok) {
+      console.error('Error al consultar precios en Supabase:', supabaseResponse.status);
+      return res.status(502).json({ error: 'No se pudo verificar el catálogo de precios.' });
+    }
+
+    const perfumes = await supabaseResponse.json();
+    const catalogoPreciosServidor = {};
+    for (const p of perfumes) {
+      catalogoPreciosServidor[`${p.marca} - ${p.nombre}`] = Number(p.precio);
+    }
 
     // Validación segura de artículos contra catálogo del servidor
     const validatedItems = [];
@@ -71,7 +54,7 @@ export default async function handler(req, res) {
       const title = String(item.title || '').trim();
       const catalogPrice = catalogoPreciosServidor[title];
 
-      if (catalogPrice === undefined) {
+      if (catalogPrice === undefined || !Number.isFinite(catalogPrice)) {
         return res.status(400).json({ error: `Producto no reconocido: "${title}"` });
       }
 
