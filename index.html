@@ -225,7 +225,6 @@
           <span>Total:</span>
           <span id="cartTotal" class="total-price">$0 MXN</span>
         </div>
-        <div id="walletBrick_container"></div>
       </div>
 
       <form id="checkoutForm" class="checkout-form" novalidate>
@@ -295,6 +294,12 @@
           <span>Confirmar Pedido</span>
           <span class="submit-arrow" aria-hidden="true">→</span>
         </button>
+
+        <!-- La pasarela de Mercado Pago se muestra aquí, debajo de los datos del cliente -->
+        <div class="wallet-brick-wrap" id="walletBrickWrap" hidden>
+          <p class="form-note"><span aria-hidden="true">🔒</span> Completa tu pago de forma segura con Mercado Pago:</p>
+          <div id="walletBrick_container"></div>
+        </div>
       </form>
     </div>
   </div>

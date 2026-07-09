@@ -639,6 +639,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       brickYaRenderizado = true;
       submitButton.style.display = 'none';
+      const brickWrap = document.getElementById('walletBrickWrap');
+      brickWrap.hidden = false;
+      brickWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       showToast('Pasarela lista: completa tu pago con Mercado Pago.', 'success');
 
     } catch (error) {

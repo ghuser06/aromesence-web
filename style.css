@@ -1461,6 +1461,18 @@ body {
   transform: translateX(4px);
 }
 
+/* Pasarela de Mercado Pago (Wallet Brick) debajo de los datos */
+.wallet-brick-wrap {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 1.25rem;
+  animation: fade-up .4s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.wallet-brick-wrap .form-note {
+  text-align: center;
+  margin-bottom: .75rem;
+}
+
 /* Spinner para estados de carga */
 .spinner {
   width: 18px;
