@@ -1,0 +1,7 @@
+# Configuración local de editores con credenciales (tokens MCP)
+.vscode/mcp.json
+.cursor/
+
+# Dependencias y artefactos
+node_modules/
+.vercel/
