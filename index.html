@@ -238,7 +238,8 @@
             </div>
             <div class="form-group">
               <label for="checkoutPhone">Teléfono</label>
-              <input type="tel" id="checkoutPhone" placeholder="+52 (___) ___-____" required autocomplete="tel">
+              <input type="tel" id="checkoutPhone" placeholder="10 dígitos, ej. 8112345678" required
+                autocomplete="tel" inputmode="tel">
             </div>
           </div>
           <div class="form-group">
@@ -266,6 +267,8 @@
               <select id="checkoutColonia" required disabled>
                 <option value="">Ingresa tu CP primero</option>
               </select>
+              <input type="text" id="checkoutColoniaManual" placeholder="Escribe tu colonia" hidden disabled
+                autocomplete="address-level3" aria-label="Colonia (captura manual)">
             </div>
           </div>
           <div class="form-row">
@@ -279,6 +282,11 @@
                 <option value="">Ingresa tu CP primero</option>
               </select>
             </div>
+          </div>
+          <div class="form-group">
+            <label for="checkoutRefs">Referencias del domicilio (opcional)</label>
+            <input type="text" id="checkoutRefs" placeholder="Entre calles, color de fachada, indicaciones para el repartidor…"
+              autocomplete="off">
           </div>
         </div>
 

@@ -435,11 +435,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ==========================================================
   const fieldMessages = {
     checkoutName: 'Ingresa tu nombre completo.',
-    checkoutPhone: 'Ingresa tu número de teléfono.',
+    checkoutPhone: 'Ingresa un teléfono de 10 dígitos (lo pide la paquetería).',
     checkoutEmail: 'Ingresa un correo válido.',
     checkoutAddress: 'Ingresa tu calle y número.',
     checkoutCP: 'Ingresa un código postal de 5 dígitos.',
     checkoutColonia: 'Selecciona tu colonia.',
+    checkoutColoniaManual: 'Escribe tu colonia.',
     checkoutCity: 'Ingresa tu ciudad o municipio.',
     checkoutState: 'Selecciona tu estado.',
   };
@@ -469,6 +470,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function validateField(field) {
     if (field.disabled) return true;
+
+    // Las paqueterías requieren teléfono de contacto a 10 dígitos
+    if (field.id === 'checkoutPhone') {
+      const digits = field.value.replace(/\D/g, '');
+      const phoneOk = digits.length === 10 || (digits.length === 12 && digits.startsWith('52'));
+      setFieldError(field, phoneOk ? '' : fieldMessages.checkoutPhone);
+      return phoneOk;
+    }
+
     const valid = field.checkValidity();
     setFieldError(field, valid ? '' : fieldMessages[field.id] || 'Revisa este campo.');
     return valid;
@@ -597,13 +607,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         currency_id: 'MXN'
       }));
 
+      // Datos del cliente para registrar el pedido (los que pide la paquetería)
+      const coloniaManualInput = document.getElementById('checkoutColoniaManual');
+      const cliente = {
+        nombre: document.getElementById('checkoutName').value.trim(),
+        telefono: document.getElementById('checkoutPhone').value.trim(),
+        email: document.getElementById('checkoutEmail').value.trim(),
+        calle: document.getElementById('checkoutAddress').value.trim(),
+        colonia: coloniaManualInput.disabled
+          ? document.getElementById('checkoutColonia').value
+          : coloniaManualInput.value.trim(),
+        codigo_postal: document.getElementById('checkoutCP').value.trim(),
+        ciudad: document.getElementById('checkoutCity').value.trim(),
+        estado: document.getElementById('checkoutState').value,
+        referencias: document.getElementById('checkoutRefs').value.trim(),
+      };
+
       // Ruta relativa: funciona en local y desplegado
       const response = await fetch('/api/crear-preferencia', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ items, cliente }),
       });
 
       if (!response.ok) {
@@ -642,7 +668,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const brickWrap = document.getElementById('walletBrickWrap');
       brickWrap.hidden = false;
       brickWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      showToast('Pasarela lista: completa tu pago con Mercado Pago.', 'success');
+      showToast(preference.numero_pedido
+        ? `Pedido #${preference.numero_pedido} registrado — completa tu pago.`
+        : 'Pasarela lista: completa tu pago con Mercado Pago.', 'success');
 
     } catch (error) {
       console.error("Error de red al conectar con /api/crear-preferencia:", error);
@@ -669,15 +697,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     await pagarConMercadoPago();
   });
 
-  // --- Autocompletado de Código Postal (Zippopotam) ---
+  // --- Código Postal: autocompletado con Zippopotam + captura manual de respaldo ---
+  // La API no cubre todos los CP de México; si no lo encuentra, el cliente
+  // escribe su colonia y elige su estado — ningún código postal se rechaza.
   const cpInput = document.getElementById('checkoutCP');
   const coloniaSelect = document.getElementById('checkoutColonia');
+  const coloniaManual = document.getElementById('checkoutColoniaManual');
   const stateSelect = document.getElementById('checkoutState');
+
+  const ESTADOS_MX = [
+    'Aguascalientes', 'Baja California', 'Baja California Sur', 'Campeche', 'Chiapas',
+    'Chihuahua', 'Ciudad de México', 'Coahuila', 'Colima', 'Durango', 'Estado de México',
+    'Guanajuato', 'Guerrero', 'Hidalgo', 'Jalisco', 'Michoacán', 'Morelos', 'Nayarit',
+    'Nuevo León', 'Oaxaca', 'Puebla', 'Querétaro', 'Quintana Roo', 'San Luis Potosí',
+    'Sinaloa', 'Sonora', 'Tabasco', 'Tamaulipas', 'Tlaxcala', 'Veracruz', 'Yucatán', 'Zacatecas',
+  ];
+
+  function activarColoniaManual() {
+    coloniaSelect.hidden = true;
+    coloniaSelect.disabled = true;
+    coloniaManual.hidden = false;
+    coloniaManual.disabled = false;
+    coloniaManual.required = true;
+
+    stateSelect.innerHTML = '<option value="">Selecciona tu estado</option>'
+      + ESTADOS_MX.map((e) => `<option value="${e}">${e}</option>`).join('');
+    stateSelect.disabled = false;
+
+    setFieldError(cpInput, '');
+    showToast('No encontramos tu CP en el sistema: escribe tu colonia y estado manualmente.', 'info');
+  }
+
+  function desactivarColoniaManual() {
+    coloniaManual.hidden = true;
+    coloniaManual.disabled = true;
+    coloniaManual.required = false;
+    coloniaSelect.hidden = false;
+  }
 
   cpInput.addEventListener('input', async (e) => {
     const cp = e.target.value;
 
     if (cp.length === 5 && !isNaN(cp)) {
+      desactivarColoniaManual();
       coloniaSelect.innerHTML = '<option value="">Cargando colonias...</option>';
       stateSelect.innerHTML = '<option value="">Cargando estado...</option>';
       coloniaSelect.disabled = true;
@@ -690,7 +752,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const data = await response.json();
         const estado = data.places[0].state;
 
-        stateSelect.innerHTML = `<option value="${esc(estado)}">${esc(estado)}</option>`;
+        stateSelect.innerHTML = `<option value="${esc(estado)}" selected>${esc(estado)}</option>`;
         stateSelect.disabled = false;
 
         coloniaSelect.innerHTML = '<option value="">Selecciona tu Colonia</option>';
@@ -704,11 +766,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         validateField(cpInput);
 
       } catch (error) {
-        coloniaSelect.innerHTML = '<option value="">CP Inválido</option>';
-        stateSelect.innerHTML = '<option value="">CP Inválido</option>';
-        setFieldError(cpInput, 'No encontramos ese código postal.');
+        // CP no cubierto por la API: nunca se bloquea la compra, se captura manual
+        activarColoniaManual();
       }
     } else {
+      desactivarColoniaManual();
       coloniaSelect.innerHTML = '<option value="">Ingresa tu CP primero</option>';
       stateSelect.innerHTML = '<option value="">Ingresa tu CP primero</option>';
       coloniaSelect.disabled = true;

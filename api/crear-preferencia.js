@@ -68,8 +68,42 @@ export default async function handler(req, res) {
       });
     }
 
+    // Validación de los datos del cliente (requisitos de la paquetería)
+    const cliente = req.body.cliente || {};
+    const clean = (v, max = 200) => String(v ?? '').trim().slice(0, max);
+    const datosCliente = {
+      nombre: clean(cliente.nombre),
+      telefono: clean(cliente.telefono, 20),
+      email: clean(cliente.email),
+      calle: clean(cliente.calle),
+      colonia: clean(cliente.colonia),
+      codigo_postal: clean(cliente.codigo_postal, 5),
+      ciudad: clean(cliente.ciudad),
+      estado: clean(cliente.estado),
+      referencias: clean(cliente.referencias, 300),
+    };
+
+    const faltantes = ['nombre', 'telefono', 'calle', 'colonia', 'codigo_postal', 'ciudad', 'estado']
+      .filter((campo) => !datosCliente[campo]);
+    if (faltantes.length > 0) {
+      return res.status(400).json({ error: `Faltan datos de envío: ${faltantes.join(', ')}` });
+    }
+
+    const telefonoDigitos = datosCliente.telefono.replace(/\D/g, '');
+    if (telefonoDigitos.length !== 10 && !(telefonoDigitos.length === 12 && telefonoDigitos.startsWith('52'))) {
+      return res.status(400).json({ error: 'El teléfono debe tener 10 dígitos.' });
+    }
+    if (!/^[0-9]{5}$/.test(datosCliente.codigo_postal)) {
+      return res.status(400).json({ error: 'El código postal debe tener 5 dígitos.' });
+    }
+
+    // Identificador del pedido: vincula la preferencia de MP con la fila en Supabase
+    const pedidoId = crypto.randomUUID();
+    const total = validatedItems.reduce((sum, it) => sum + it.unit_price * it.quantity, 0);
+
     const preferenceBody = {
       items: validatedItems,
+      external_reference: pedidoId,
       // URLs de retorno para que el frontend pueda leer el resultado del pago
       back_urls: {
         success: 'https://ghuser06.github.io/aromesence-web/?status=success',
@@ -99,10 +133,41 @@ export default async function handler(req, res) {
       });
     }
 
+    // Registrar el pedido en Supabase (tabla `pedidos`) con número consecutivo.
+    // Si el registro falla no se bloquea la venta: se loggea y se continúa.
+    let numeroPedido = null;
+    try {
+      const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/rpc/crear_pedido`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          datos: {
+            id: pedidoId,
+            ...datosCliente,
+            items: validatedItems,
+            total,
+            mp_preference_id: mpData.id,
+          },
+        }),
+      });
+      if (insertResponse.ok) {
+        numeroPedido = await insertResponse.json();
+      } else {
+        console.error('No se pudo registrar el pedido en Supabase:', insertResponse.status, await insertResponse.text());
+      }
+    } catch (err) {
+      console.error('Error registrando el pedido en Supabase:', err);
+    }
+
     // Retornas los puntos de inicio necesarios para los Bricks o el Checkout Pro
     return res.status(200).json({
       id: mpData.id,
-      init_point: mpData.init_point
+      init_point: mpData.init_point,
+      numero_pedido: numeroPedido
     });
 
   } catch (error) {
