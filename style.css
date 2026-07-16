@@ -53,7 +53,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 5rem;
+  scroll-padding-top: 7.5rem;
 }
 
 body {
@@ -147,10 +147,46 @@ body {
   }
 }
 
+/* ===== BARRA DE ANUNCIOS ===== */
+.announce-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 101;
+  height: 36px;
+  background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light));
+  color: var(--bg-primary);
+  overflow: hidden;
+}
+
+.announce-msg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  padding: 0 1rem;
+  margin: 0;
+  font-size: .78rem;
+  font-weight: 650;
+  letter-spacing: .5px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .45s cubic-bezier(.22, 1, .36, 1), transform .45s cubic-bezier(.22, 1, .36, 1);
+}
+
+.announce-msg.active {
+  opacity: 1;
+  transform: none;
+}
+
 /* ===== NAV ===== */
 .navbar {
   position: fixed;
-  top: 0;
+  top: 36px;
   left: 0;
   right: 0;
   z-index: 100;
@@ -296,7 +332,7 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 7rem 1.25rem 3.5rem;
+  padding: 9rem 1.25rem 3.5rem;
   overflow: hidden;
 }
 
@@ -1064,6 +1100,24 @@ body {
   color: var(--success);
   font-weight: 600;
   font-size: .8rem;
+}
+
+.summary-row .shipping-hint {
+  color: var(--text-muted);
+  font-size: .78rem;
+}
+
+/* Aviso de cuánto falta para envío gratis */
+.free-ship-hint {
+  background: rgba(201, 169, 110, .08);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--accent-gold);
+  font-size: .78rem;
+  text-align: center;
+  padding: .5rem .8rem;
+  margin-top: .6rem;
+  animation: fade-up .3s ease both;
 }
 
 .summary-row.summary-total {

@@ -253,14 +253,20 @@ function updateCartUI() {
     </div>
   `).join('');
 
+  const ENVIO_GRATIS_DESDE = 3500;
   const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+  const faltante = ENVIO_GRATIS_DESDE - subtotal;
   summaryBox.innerHTML = `
     <div class="summary-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>
-    <div class="summary-row"><span>Envío</span><span class="free-shipping">Gratis</span></div>
+    <div class="summary-row"><span>Envío</span>${faltante <= 0
+      ? '<span class="free-shipping">Gratis ✓</span>'
+      : `<span class="shipping-hint">Gratis desde ${money(ENVIO_GRATIS_DESDE)}</span>`
+    }</div>
     <div class="summary-row summary-total">
       <span>Total:</span>
       <span class="amount" id="cartSidebarTotal">${money(subtotal)}</span>
-    </div>`;
+    </div>
+    ${faltante > 0 ? `<div class="free-ship-hint">Agrega ${money(faltante)} más y tu envío es GRATIS 🚚</div>` : ''}`;
 }
 
 // ==========================================================
@@ -318,6 +324,17 @@ function trapFocus(container, e) {
 // Inicialización
 // ==========================================================
 document.addEventListener('DOMContentLoaded', async () => {
+  // --- Barra de anuncios rotativa ---
+  const announceMsgs = document.querySelectorAll('#announceBar .announce-msg');
+  if (announceMsgs.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let announceIdx = 0;
+    setInterval(() => {
+      announceMsgs[announceIdx].classList.remove('active');
+      announceIdx = (announceIdx + 1) % announceMsgs.length;
+      announceMsgs[announceIdx].classList.add('active');
+    }, 4000);
+  }
+
   // --- Menú móvil ---
   const navToggle = document.getElementById('navToggle');
   const navLinks = document.getElementById('navLinks');
