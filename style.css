@@ -1703,6 +1703,30 @@ body {
   color: var(--accent-gold);
 }
 
+.footer-social {
+  margin-bottom: 1.5rem;
+}
+
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: .88rem;
+  border: 1px solid var(--border-subtle);
+  padding: .55rem 1.2rem;
+  border-radius: 50px;
+  transition: color var(--transition), border-color var(--transition), background var(--transition);
+}
+
+.footer-social a:hover,
+.footer-social a:focus-visible {
+  color: var(--accent-gold);
+  border-color: var(--accent-gold);
+  background: rgba(201, 169, 110, .08);
+}
+
 /* ============================================================
    RESPONSIVE — mobile-first: mejoras progresivas hacia arriba
    ============================================================ */
