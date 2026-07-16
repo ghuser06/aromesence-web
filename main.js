@@ -47,6 +47,7 @@ async function cargarCatalogo() {
       img: p.imagen,
       badge: p.badge,
       stock: p.stock,
+      genero: p.genero || 'caballero',
     }));
   } catch (err) {
     console.error('No se pudo cargar el catálogo desde Supabase, usando respaldo local:', err);
@@ -68,12 +69,23 @@ function renderSkeletons(count = 8) {
 }
 
 function renderProducts() {
-  const grid = document.getElementById('productGrid');
+  renderGrid('productGrid', 'caballero');
+  renderGrid('productGridDama', 'dama');
+}
+
+function renderGrid(gridId, genero) {
+  const grid = document.getElementById(gridId);
   if (!grid) return;
 
   const query = searchQuery.trim().toLowerCase();
-  const visibles = catalogo
+  const delGenero = catalogo
     .map((p, i) => ({ p, i }))
+    .filter(({ p }) => (p.genero || 'caballero') === genero);
+
+  // Sin productos de dama cargados: se conservan las tarjetas "Próximamente"
+  if (delGenero.length === 0) return;
+
+  const visibles = delGenero
     .filter(({ p }) => !query || `${p.brand} ${p.name}`.toLowerCase().includes(query));
 
   if (visibles.length === 0) {
